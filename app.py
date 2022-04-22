@@ -41,14 +41,6 @@ class Movie(db.Model):
 def hello():
     return '<h1>Hello Totoro!</h1><img src="http://helloflask.com/totoro.gif">'
 
-@app.route('/')
-def index():
-    user = User.query.first()
- # 读取用户记录
-    movies = Movie.query.all()
- # 读取所有电影记录
-    return render_template('index.html', user=user, movies=movies)
-    #return render_template('index.html', name=name, movies=movies)
 
 @app.cli.command()
  # 注册为命令
@@ -87,3 +79,18 @@ def forge():
         db.session.add(movie)
     db.session.commit()
     click.echo('Done.')
+
+@app.context_processor
+def inject_user():
+	user = User.query.first()
+	return dict(user=user)
+
+@app.errorhandler(404)
+def page_not_found(e):
+	return render_template('404.html'), 404
+
+@app.route('/')
+def index():
+	movies = Movie.query.all()
+	return render_template('index.html', movies=movies)
+
